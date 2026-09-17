@@ -1,0 +1,12 @@
+<div class="header-actions">
+  <form method="POST" action="{{ url_for('reset_semester') }}" class="d-inline"
+        onsubmit="return confirm('This resets every student\'s semester hours to 0 / {{ target_hours }}. Yearly totals will NOT be affected. Continue?');">
+    {{ global_reset_form.hidden_tag() }}
+    <button class="btn-app-outline-danger" type="submit">
+      <i class="bi bi-arrow-counterclockwise"></i> Reset Semester
+    </button>
+  </form>
+  <a class="btn-app-primary" href="{{ url_for('semester_admin') }}#add-student">
+    <i class="bi bi-plus-circle"></i> Add Student
+  </a>
+</div>

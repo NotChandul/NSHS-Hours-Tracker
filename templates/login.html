@@ -1,0 +1,23 @@
+{% extends 'auth_base.html' %}
+{% block title %}Log in{% endblock %}
+{% block auth_content %}
+<form method="POST" novalidate>
+  {{ form.hidden_tag() }}
+
+  <label class="auth-label" for="{{ form.student_id.id }}">Student ID or Coordinator ID</label>
+  <div class="auth-input-group">
+    <i class="bi bi-mortarboard"></i>
+    {{ form.student_id(class="auth-input", placeholder="e.g. 1234567") }}
+  </div>
+
+  <label class="auth-label" for="{{ form.password.id }}">Password</label>
+  <div class="auth-input-group">
+    <i class="bi bi-lock"></i>
+    {{ form.password(class="auth-input") }}
+    <i class="bi bi-eye toggle-password" onclick="togglePassword('{{ form.password.id }}', this)"></i>
+  </div>
+
+  <button class="btn-app-primary btn-app-block" type="submit">Access Portal</button>
+</form>
+<p class="field-help text-center mt-3">Don't have an account? <a href="{{ url_for('register') }}">Register here</a>.</p>
+{% endblock %}

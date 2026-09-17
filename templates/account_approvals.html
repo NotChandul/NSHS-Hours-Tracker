@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Account Approvals{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Account Approvals</h1>
+    <p class="page-subtitle">New self-registered accounts wait here until a coordinator approves them</p>
+  </div>
+  {% include '_coordinator_header_actions.html' %}
+</div>
+
+<div class="card-panel">
+  <div class="card-panel-header">
+    <div>
+      <h2 class="card-panel-title">Pending Registrations</h2>
+      <p class="card-panel-sub">These students cannot log in yet</p>
+    </div>
+    {% if pending %}
+      <form method="POST" action="{{ url_for('approve_all_accounts') }}"
+            onsubmit="return confirm('Approve all {{ pending|length }} pending account(s)?');">
+        {{ approve_form.hidden_tag() }}
+        <button class="btn-app-primary" type="submit"><i class="bi bi-check2-all"></i> Approve All</button>
+      </form>
+    {% endif %}
+  </div>
+
+  {% if pending %}
+    <table class="table-app">
+      <thead>
+        <tr><th>Name</th><th>Student ID</th><th>Registered</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        {% for u in pending %}
+        <tr>
+          <td>{{ u.name }}</td>
+          <td>#{{ u.student_id }}</td>
+          <td>{{ u.date_created.strftime('%b %d, %Y') }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('approve_account', user_id=u.id) }}">
+              {{ approve_form.hidden_tag() }}
+              <button class="btn-app-primary btn-app-sm" type="submit"><i class="bi bi-check2"></i> Approve</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="empty-state">
+      <i class="bi bi-check2-circle"></i>
+      <strong>All caught up!</strong>
+      <p class="mb-0">No accounts are waiting for approval right now.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

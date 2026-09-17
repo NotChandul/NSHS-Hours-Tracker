@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}Semester Admin{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Semester Administration</h1>
+    <p class="page-subtitle">Active Semester: {{ semester_label }} &bull; Required Target: {{ target_hours }} hrs</p>
+  </div>
+  {% include '_coordinator_header_actions.html' %}
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card-panel">
+      <h2 class="card-panel-title">Semester Rules</h2>
+      <p class="card-panel-sub mb-3">Configure parameters for active Honors status</p>
+
+      <form method="POST" action="{{ url_for('update_semester_settings') }}" novalidate>
+        {{ settings_form.hidden_tag() }}
+
+        <div class="field-group">
+          <label class="field-label">Semester Label</label>
+          {{ settings_form.semester_label(class="field-input") }}
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Required Semester Service Hours Target</label>
+          <div class="d-flex gap-2">
+            {{ settings_form.target_hours(class="field-input") }}
+            <button class="btn-app-primary" type="submit" style="flex-shrink:0;">Update Target Goal</button>
+          </div>
+          <p class="field-help">Standard honors society recommendation is 4.0 semester hours.</p>
+        </div>
+      </form>
+
+      <hr class="my-4" style="border-color: var(--border-light);">
+
+      <h3 class="card-panel-title" style="font-size: .95rem;">Reset Semester Progress</h3>
+      <p class="field-help">At the transition of semesters, wipe all students' current semester progress hours
+        back to 0. This does <strong>NOT</strong> delete their total lifetime logged hours.</p>
+
+      <form method="POST" action="{{ url_for('reset_semester') }}"
+            onsubmit="return confirm('This resets every student\'s semester hours to 0 / {{ target_hours }}. Yearly totals will NOT be affected. Continue?');">
+        {{ global_reset_form.hidden_tag() }}
+        <button class="btn-app-outline-danger" type="submit">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset Student Semester Progress Counter
+        </button>
+      </form>
+    </div>
+
+    <div class="card-panel" style="border-color: var(--red-bg);">
+      <h2 class="card-panel-title" style="color: var(--red-text);">Danger Zone</h2>
+      <p class="field-help">Permanently delete every student account and all of their hour records.
+        Passwords, names, and submission history are wiped completely. <strong>Coordinator accounts
+        are never affected</strong> &mdash; only accounts with the student role are removed. Anyone
+        who needs access afterward will have to register again.</p>
+
+      <form method="POST" action="{{ url_for('wipe_all_students') }}"
+            onsubmit="return confirm('This PERMANENTLY deletes every student account and all of their hour history. Coordinators are not affected. This cannot be undone. Are you absolutely sure?');">
+        {{ wipe_form.hidden_tag() }}
+        <button class="btn-app-outline-danger" type="submit">
+          <i class="bi bi-trash3"></i> Wipe All Student Accounts
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card-panel" id="add-student">
+      <h2 class="card-panel-title">Add Student Accounts</h2>
+      <p class="card-panel-sub mb-3">Create new credentials instantly for administrative pre-approval</p>
+
+      <form method="POST" action="{{ url_for('add_student') }}" novalidate>
+        {{ add_form.hidden_tag() }}
+
+        <div class="field-group">
+          <label class="field-label">Student Full Name</label>
+          {{ add_form.name(class="field-input", placeholder="e.g. Richard Feynman") }}
+          {% for error in add_form.name.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="field-label">Student ID</label>
+            {{ add_form.student_id(class="field-input", placeholder="e.g. 10452") }}
+            {% for error in add_form.student_id.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-6">
+            <label class="field-label">Initial Password</label>
+            {{ add_form.password(class="field-input", placeholder="e.g. pass123") }}
+            {% for error in add_form.password.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+          </div>
+        </div>
+
+        <button class="btn-app-primary btn-app-block mt-3" type="submit">
+          <i class="bi bi-person-plus"></i> Register New Account
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

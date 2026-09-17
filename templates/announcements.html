@@ -1,0 +1,41 @@
+{% extends layout %}
+{% block title %}Announcements{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Announcements Center</h1>
+    <p class="page-subtitle">Official directives and event invitations</p>
+  </div>
+  {% if global_reset_form %}{% include '_coordinator_header_actions.html' %}{% endif %}
+</div>
+
+{% if form %}
+<div class="card-panel">
+  <h2 class="card-panel-title">Post an Announcement</h2>
+  <form method="POST" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="field-group">
+      <label class="field-label">Title</label>
+      {{ form.title(class="field-input") }}
+    </div>
+    <div class="field-group">
+      <label class="field-label">Announcement</label>
+      {{ form.body(class="field-input", rows="3") }}
+    </div>
+    <button class="btn-app-primary" type="submit"><i class="bi bi-megaphone"></i> Post Announcement</button>
+  </form>
+</div>
+{% endif %}
+
+<div class="card-panel">
+  {% for a in announcements %}
+    <div class="mb-3 {{ 'pb-3 border-bottom' if not loop.last else '' }}">
+      <strong>{{ a.title }}</strong>
+      <p class="mb-1" style="font-size:.9rem;">{{ a.body }}</p>
+      <p class="field-help">{{ a.date_posted.strftime('%B %d, %Y') }}</p>
+    </div>
+  {% else %}
+    <p class="field-help">No announcements yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

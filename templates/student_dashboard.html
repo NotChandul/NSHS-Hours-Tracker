@@ -1,0 +1,134 @@
+{% extends 'student_base.html' %}
+{% block title %}My Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Welcome back, {{ current_user.name }}!</h1>
+    <p class="page-subtitle">Science honors community service portal &bull; Academic Year {{ academic_year }}</p>
+  </div>
+  {% if pending_hours > 0 %}
+    <span class="badge-app badge-amber">{{ pending_hours }} hrs Pending</span>
+  {% endif %}
+</div>
+
+<div class="row g-4 mb-1">
+  <div class="col-md-4">
+    <div class="card-panel">
+      <p class="stat-label">Semester Service Progress</p>
+      <p class="stat-value">{{ current_user.semester_hours }} <span style="font-size:1rem;color:var(--text-muted);">/ {{ target_hours }} target hours</span></p>
+      <div class="progress-track">
+        <div class="progress-fill" id="semesterProgressFill" data-percent="{{ progress_percent }}"></div>
+      </div>
+      <p class="stat-sub">{{ progress_percent }}% Complete &bull; Goal: {{ target_hours }} Hours</p>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card-panel">
+      <p class="stat-label">Total Lifetime Contributions</p>
+      <p class="stat-value">{{ current_user.total_hours_year }}</p>
+      <p class="stat-sub">cumulative hours logged</p>
+      <p class="field-help mt-2"><i class="bi bi-stars"></i> Consistently making a scientific contribution.</p>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card-panel-dark">
+      <h6>Academic Policy</h6>
+      <strong>Active Membership Criteria</strong>
+      <p class="field-help mt-2" style="color:#c3cdec;">Successfully verify at least {{ target_hours }} hours of approved
+        service logs before the deadline to sustain active NSHS credentials.</p>
+      <div class="d-flex justify-content-between" style="font-size:.75rem;color:#9db1e0;">
+        <span>Requirement Target:</span><strong style="color:#fff;">{{ target_hours }} Hours</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card-panel">
+      <h2 class="card-panel-title">Log Service Hours</h2>
+      <p class="card-panel-sub mb-3">Submit completed hours for staff verification</p>
+
+      <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="field-group">
+          <label class="field-label">Service Hours</label>
+          {{ form.hours(class="field-input", placeholder="e.g. 2.5") }}
+          {% for error in form.hours.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Completion Date</label>
+          {{ form.date_completed(class="field-input", type="date") }}
+          {% for error in form.date_completed.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Activity Description <span class="field-help">(Optional)</span></label>
+          {{ form.description(class="field-input", rows="3", placeholder="Describe your scientific or tutor community work details...") }}
+        </div>
+
+        <button class="btn-app-primary btn-app-block" type="submit"><i class="bi bi-clock-history"></i> Log Service Record</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card-panel">
+      <h2 class="card-panel-title">Your Service Log History</h2>
+      <p class="card-panel-sub mb-3">Current status and verification details of submissions</p>
+
+      {% for s in submissions %}
+        <div class="d-flex justify-content-between align-items-start py-2 {{ 'border-bottom' if not loop.last else '' }}">
+          <div>
+            <span class="badge-app badge-purple">+{{ s.hours }} hrs</span>
+            <span class="field-help">{{ s.date_completed.strftime('%Y-%m-%d') }}</span>
+            <p class="mb-0" style="font-size:.85rem;">{{ s.description or '—' }}</p>
+          </div>
+          <div>
+            {% if s.status == 'approved' %}
+              <span class="badge-app badge-green">Approved</span>
+            {% elif s.status == 'rejected' %}
+              <span class="badge-app badge-red">Needs changes</span>
+            {% else %}
+              <span class="badge-app badge-amber">Pending</span>
+            {% endif %}
+          </div>
+        </div>
+      {% else %}
+        <p class="field-help">No submissions yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="card-panel mt-1">
+  <div class="d-flex align-items-start gap-3">
+    <i class="bi bi-megaphone" style="font-size:1.4rem;color:var(--accent);"></i>
+    <div>
+      <h2 class="card-panel-title">Broadcast Bulletin</h2>
+      <p class="card-panel-sub mb-3">Official directives and event invitations</p>
+
+      {% for a in announcements %}
+        <div class="mb-2">
+          <strong>{{ a.title }}</strong>
+          <p class="mb-1" style="font-size:.85rem;">{{ a.body }}</p>
+          <p class="field-help">{{ a.date_posted.strftime('%Y-%m-%d') }}</p>
+        </div>
+      {% else %}
+        <p class="field-help">No announcements yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const fill = document.getElementById('semesterProgressFill');
+    fill.style.width = fill.dataset.percent + '%';
+  });
+</script>
+{% endblock %}

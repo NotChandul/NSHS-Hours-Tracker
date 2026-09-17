@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Add Hours{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Add Hours — {{ student.name }}</h1>
+    <p class="page-subtitle">#{{ student.student_id }} &bull; {{ student.semester_hours }} / {{ target_hours }} this semester &bull; {{ student.total_hours_year }} total this year</p>
+  </div>
+</div>
+
+<div class="card-panel" style="max-width: 480px;">
+  <p class="field-help mb-3">These hours are added as already-approved — no request or review step needed.</p>
+
+  <form method="POST" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="field-group">
+      <label class="field-label">Hours to add</label>
+      {{ form.hours(class="field-input") }}
+      {% for error in form.hours.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Date completed</label>
+      {{ form.date_completed(class="field-input", type="date") }}
+      {% for error in form.date_completed.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Description (optional)</label>
+      {{ form.description(class="field-input", rows="3") }}
+    </div>
+
+    <button class="btn-app-primary" type="submit"><i class="bi bi-plus-circle"></i> Add Hours</button>
+    <a class="btn-app-link" href="{{ url_for('students_master') }}">Cancel</a>
+  </form>
+</div>
+{% endblock %}

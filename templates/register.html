@@ -1,0 +1,40 @@
+{% extends 'auth_base.html' %}
+{% block title %}Register{% endblock %}
+{% block auth_content %}
+<form method="POST" novalidate>
+  {{ form.hidden_tag() }}
+
+  <label class="auth-label" for="{{ form.name.id }}">Full Name</label>
+  <div class="auth-input-group">
+    <i class="bi bi-person"></i>
+    {{ form.name(class="auth-input") }}
+  </div>
+  {% for error in form.name.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+
+  <label class="auth-label mt-3" for="{{ form.student_id.id }}">Student ID</label>
+  <div class="auth-input-group">
+    <i class="bi bi-mortarboard"></i>
+    {{ form.student_id(class="auth-input", placeholder="e.g. 1234567") }}
+  </div>
+  {% for error in form.student_id.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+
+  <label class="auth-label mt-3" for="{{ form.password.id }}">Password</label>
+  <div class="auth-input-group">
+    <i class="bi bi-lock"></i>
+    {{ form.password(class="auth-input") }}
+    <i class="bi bi-eye toggle-password" onclick="togglePassword('{{ form.password.id }}', this)"></i>
+  </div>
+  {% for error in form.password.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+
+  <label class="auth-label mt-3" for="{{ form.confirm_password.id }}">Confirm Password</label>
+  <div class="auth-input-group">
+    <i class="bi bi-lock"></i>
+    {{ form.confirm_password(class="auth-input") }}
+    <i class="bi bi-eye toggle-password" onclick="togglePassword('{{ form.confirm_password.id }}', this)"></i>
+  </div>
+  {% for error in form.confirm_password.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+
+  <button class="btn-app-primary btn-app-block mt-3" type="submit">Create Account</button>
+</form>
+<p class="field-help text-center mt-3">Already have an account? <a href="{{ url_for('login') }}">Log in</a>.</p>
+{% endblock %}

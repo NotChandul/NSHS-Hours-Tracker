@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block title %}Student Roster{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Master Student Key</h1>
+    <p class="page-subtitle">Active Semester: {{ semester_label }} &bull; Required Target: {{ target_hours }} hrs</p>
+  </div>
+  {% include '_coordinator_header_actions.html' %}
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card-panel">
+      <div class="card-panel-header">
+        <div>
+          <h2 class="card-panel-title">Student Database</h2>
+          <p class="card-panel-sub">Search and manage NSHS student credentials</p>
+        </div>
+        <input id="rosterSearch" class="field-input" style="max-width: 220px;" placeholder="Search ID, name, status...">
+      </div>
+
+      <table class="table-app" id="rosterTable">
+        <thead>
+          <tr>
+            <th>Name</th><th>Student ID</th><th>Semester Progress</th><th>Total Lifetime</th><th>Role</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in all_users %}
+          <tr>
+            <td>{{ u.name }}</td>
+            <td>#{{ u.student_id }}</td>
+            <td>
+              {% if u.role == 'coordinator' %}
+                <span class="field-help">&mdash;</span>
+              {% else %}
+                {{ u.semester_hours }} hrs
+                <div class="field-help">Target: {{ target_hours }} hrs</div>
+              {% endif %}
+            </td>
+            <td>
+              {% if u.role == 'coordinator' %}
+                <span class="field-help">&mdash;</span>
+              {% else %}
+                <strong>{{ u.total_hours_year }} hrs</strong>
+              {% endif %}
+            </td>
+            <td>
+              {% if u.role == 'coordinator' %}
+                <span class="badge-app badge-purple">Staff</span>
+              {% elif u.semester_hours >= target_hours %}
+                <span class="badge-app badge-green">Met</span>
+              {% else %}
+                <span class="badge-app badge-red">Short</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex flex-wrap gap-1">
+                {% if u.role == 'coordinator' %}
+                  {% if coordinator_count <= 1 %}
+                    <span class="field-help">Last coordinator</span>
+                  {% else %}
+                    <form method="POST" action="{{ url_for('demote_coordinator', user_id=u.id) }}"
+                          onsubmit="return confirm('Demote {{ u.name }} back to a student account?');">
+                      {{ role_form.hidden_tag() }}
+                      <button class="btn-app-outline-danger btn-app-sm" type="submit">Demote</button>
+                    </form>
+                  {% endif %}
+                {% else %}
+                  <form method="POST" action="{{ url_for('promote_student', user_id=u.id) }}"
+                        onsubmit="return confirm('Promote {{ u.name }} to coordinator? They will be able to approve hours and manage the roster.');">
+                    {{ role_form.hidden_tag() }}
+                    <button class="btn-app-outline btn-app-sm" type="submit">Promote</button>
+                  </form>
+                  <a class="btn-app-outline btn-app-sm" href="{{ url_for('reset_password', user_id=u.id) }}">Reset PW</a>
+                  <form method="POST" action="{{ url_for('delete_student', user_id=u.id) }}"
+                        onsubmit="return confirm('Permanently delete {{ u.name }}\'s account and all of their hour records? This cannot be undone.');">
+                    {{ role_form.hidden_tag() }}
+                    <button class="btn-app-outline-danger btn-app-sm" type="submit">Delete</button>
+                  </form>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="field-help">No accounts yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card-panel">
+      <h2 class="card-panel-title">Roster Controls</h2>
+      <p class="card-panel-sub mb-3">Log Hours &amp; Promotion</p>
+
+      <label class="field-label">Select Target Member</label>
+      <select id="targetMemberSelect" class="field-input">
+        <option value="">-- Choose Member --</option>
+        {% for u in all_users if u.role == 'student' %}
+          <option value="{{ url_for('add_hours', user_id=u.id) }}">{{ u.name }} (#{{ u.student_id }})</option>
+        {% endfor %}
+      </select>
+      <button class="btn-app-primary btn-app-block mt-3" onclick="goToMember()">
+        <i class="bi bi-clock-history"></i> Log Hours for Selected
+      </button>
+
+      <p class="field-help mt-3">Use the table to Promote, Reset Password, or permanently Delete an
+        individual account. Bulk actions live on the Semester Admin page.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function goToMember() {
+    const select = document.getElementById('targetMemberSelect');
+    if (select.value) { window.location = select.value; }
+  }
+
+  document.getElementById('rosterSearch').addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+    document.querySelectorAll('#rosterTable tbody tr').forEach(function (row) {
+      row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+    });
+  });
+</script>
+{% endblock %}

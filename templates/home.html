@@ -1,0 +1,19 @@
+{% extends 'public_base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h1 class="page-title">National Science Honors Society</h1>
+<p class="page-subtitle mb-4">Submit and track your service hours digitally — no more lost paper slips.</p>
+
+<div class="card-panel">
+  <h2 class="card-panel-title">Latest Announcements</h2>
+  {% for a in announcements %}
+    <div class="mb-3">
+      <strong>{{ a.title }}</strong>
+      <p class="mb-1" style="font-size:.9rem;">{{ a.body }}</p>
+      <p class="field-help">{{ a.date_posted.strftime('%B %d, %Y') }}</p>
+    </div>
+  {% else %}
+    <p class="field-help">No announcements yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

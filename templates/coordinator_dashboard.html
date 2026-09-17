@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Pending Requests{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Semester Control</h1>
+    <p class="page-subtitle">Active Semester: {{ semester_label }} &bull; Required Target: {{ target_hours }} hrs</p>
+  </div>
+  {% include '_coordinator_header_actions.html' %}
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card-panel">
+      <div class="card-panel-header">
+        <div>
+          <h2 class="card-panel-title">Student Hour Requests</h2>
+          <p class="card-panel-sub">Review submitted community service logs</p>
+        </div>
+        <span class="badge-app badge-amber">{{ pending|length }} New</span>
+      </div>
+
+      {% if pending %}
+        <table class="table-app">
+          <thead>
+            <tr><th>Student</th><th>Date</th><th>Hours</th><th>Description</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            {% for s in pending %}
+            <tr>
+              <td>{{ s.student.name }}<br><span class="field-help">#{{ s.student.student_id }}</span></td>
+              <td>{{ s.date_completed.strftime('%m/%d/%Y') }}</td>
+              <td>{{ s.hours }}</td>
+              <td>{{ s.description }}</td>
+              <td>
+                <a class="btn-app-primary" href="{{ url_for('approve_submission', submission_id=s.id) }}"><i class="bi bi-check2"></i></a>
+                <a class="btn-app-outline-danger" href="{{ url_for('reject_submission', submission_id=s.id) }}"><i class="bi bi-x"></i></a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="empty-state">
+          <i class="bi bi-check2-circle"></i>
+          <strong>All caught up!</strong>
+          <p class="mb-0">No student hours are currently awaiting your manual verification.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card-panel">
+      <h2 class="card-panel-title">Audit History</h2>
+      <p class="card-panel-sub mb-3">Recently resolved submissions</p>
+
+      {% for s in recent_history %}
+        <div class="d-flex justify-content-between align-items-start py-2 {{ 'border-bottom' if not loop.last else '' }}">
+          <div>
+            <strong>{{ s.student.name }}</strong>
+            <div class="field-help">{{ s.hours }} hrs completed</div>
+          </div>
+          <div class="text-end">
+            {% if s.status == 'approved' %}
+              <span class="badge-app badge-green">Approved</span>
+            {% else %}
+              <span class="badge-app badge-red">Rejected</span>
+            {% endif %}
+            <div class="field-help">{{ s.date_completed.strftime('%Y-%m-%d') }}</div>
+          </div>
+        </div>
+      {% else %}
+        <p class="field-help">No resolved submissions yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
