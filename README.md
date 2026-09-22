@@ -62,15 +62,6 @@ a coordinator:
    ```
 3. Log out and back in — you'll now land on the coordinator dashboard.
 
-## Before you deploy this publicly
-
-- Move `SECRET_KEY` out of `app.py` and into an environment variable.
-- Turn off `debug=True` in production.
-- Double check with your sponsor teacher / school IT that storing student
-  names and activity records on your chosen free host is fine under school
-  policy.
-
-See the security checklist from earlier in this build for the full list.
 
 # to reset the database, enter into the venv terminal on vscode,
 #python -c "from app import app; from models import db; app.app_context().push(); db.drop_all(); db.create_all(); print('Database reset.')"
